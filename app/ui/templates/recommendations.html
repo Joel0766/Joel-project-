@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recommendations</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Recommendations</h1>
+    <nav>
+      <a href="/ui">Home</a>
+      <a href="/ui/upload">Upload Data</a>
+      <a href="/ui/job">Run Forecast</a>
+    </nav>
+  </header>
+  <main>
+    <div class="filters">
+      <select id="actionFilter" onchange="filterTable()">
+        <option value="">All Actions</option>
+        <option value="BUY_MORE">BUY_MORE</option>
+        <option value="BUY_LESS">BUY_LESS</option>
+        <option value="HOLD">HOLD</option>
+      </select>
+      <select id="abcFilter" onchange="filterTable()">
+        <option value="">All ABC</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </select>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Action</th>
+          <th>Order Units</th>
+          <th>ROP</th>
+          <th>Safety Stock</th>
+          <th>ABC</th>
+        </tr>
+      </thead>
+      <tbody id="recTable">
+        {% for rec in recommendations %}
+        <tr data-action="{{ rec.action }}" data-abc="{{ rec.abc_class }}">
+          <td><a href="/ui/sku/{{ rec.sku_id }}">{{ rec.sku_id }}</a></td>
+          <td>{{ rec.action }}</td>
+          <td>{{ rec.recommended_order_units }}</td>
+          <td>{{ '%.1f' | format(rec.reorder_point) }}</td>
+          <td>{{ '%.1f' | format(rec.safety_stock) }}</td>
+          <td>{{ rec.abc_class }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+  <script>
+    function filterTable() {
+      const action = document.getElementById('actionFilter').value;
+      const abc = document.getElementById('abcFilter').value;
+      document.querySelectorAll('#recTable tr').forEach(row => {
+        const matchAction = !action || row.dataset.action === action;
+        const matchAbc = !abc || row.dataset.abc === abc;
+        row.style.display = matchAction && matchAbc ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

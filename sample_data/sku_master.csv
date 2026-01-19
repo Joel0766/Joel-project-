@@ -1,0 +1,4 @@
+sku_id,sku_name,category,uom,unit_cost,unit_price,supplier_id,lead_time_days,min_order_qty,pack_size,discontinued
+SKU-001,Sparkling Water,Beverage,case,8.5,12.0,SUP-1,10,20,10,False
+SKU-002,Potato Chips,Snacks,case,5.0,9.0,SUP-2,14,30,12,False
+SKU-003,Energy Bar,Snacks,box,3.0,6.0,SUP-2,7,10,8,False

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SKU Detail</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>SKU {{ rec.sku_id if rec else '' }}</h1>
+    <nav>
+      <a href="/ui/recommendations">Back to Recommendations</a>
+    </nav>
+  </header>
+  <main>
+    {% if rec %}
+    <section class="card">
+      <h2>Recommendation</h2>
+      <p><strong>Action:</strong> {{ rec.action }}</p>
+      <p><strong>Order Units:</strong> {{ rec.recommended_order_units }}</p>
+      <p><strong>ROP:</strong> {{ '%.1f' | format(rec.reorder_point) }}</p>
+      <p><strong>Safety Stock:</strong> {{ '%.1f' | format(rec.safety_stock) }}</p>
+      <p><strong>Why:</strong> {{ rec.explanation }}</p>
+    </section>
+    <section class="card">
+      <h2>Forecast</h2>
+      <canvas id="forecastChart"></canvas>
+    </section>
+    <section class="card">
+      <h2>Override</h2>
+      <form id="overrideForm">
+        <label>New Order Qty
+          <input type="number" name="new_order_qty" required />
+        </label>
+        <label>Reason
+          <textarea name="reason_text" required></textarea>
+        </label>
+        <button type="submit">Submit Override</button>
+      </form>
+      <pre id="overrideStatus"></pre>
+    </section>
+    {% else %}
+    <p>No recommendation found for this SKU.</p>
+    {% endif %}
+  </main>
+
+  <script>
+    const forecastData = [
+      {% for f in forecasts %}
+        { week: '{{ f.week_start }}', mean: {{ f.forecast_mean }} },
+      {% endfor %}
+    ];
+    if (forecastData.length > 0) {
+      const ctx = document.getElementById('forecastChart');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: forecastData.map(d => d.week),
+          datasets: [{
+            label: 'Forecast',
+            data: forecastData.map(d => d.mean),
+            borderColor: '#2b6cb0',
+            fill: false
+          }]
+        }
+      });
+    }
+
+    const form = document.getElementById('overrideForm');
+    if (form) {
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        const payload = {
+          new_order_qty: Number(formData.get('new_order_qty')),
+          reason_text: formData.get('reason_text'),
+        };
+        const response = await fetch(`/recommendations/{{ rec.id if rec else 0 }}/override`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        document.getElementById('overrideStatus').innerText = JSON.stringify(data, null, 2);
+      });
+    }
+  </script>
+</body>
+</html>

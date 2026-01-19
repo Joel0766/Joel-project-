@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Run Forecast</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Run Forecast Job</h1>
+    <nav>
+      <a href="/ui">Home</a>
+      <a href="/ui/upload">Upload Data</a>
+      <a href="/ui/recommendations">Recommendations</a>
+    </nav>
+  </header>
+  <main>
+    <div class="card">
+      <label>Dataset Version</label>
+      <select id="dataset">
+        {% for dataset in datasets %}
+          <option value="{{ dataset.id }}">Dataset {{ dataset.id }}</option>
+        {% endfor %}
+      </select>
+      <label>Horizon (weeks)</label>
+      <input id="horizon" type="number" value="8" min="1" />
+      <button onclick="runForecast()">Run Forecast</button>
+      <pre id="status"></pre>
+    </div>
+  </main>
+  <script>
+    async function runForecast() {
+      const datasetId = document.getElementById('dataset').value;
+      const horizon = document.getElementById('horizon').value;
+      const response = await fetch('/jobs/run_forecast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dataset_version_id: Number(datasetId), horizon_weeks: Number(horizon) })
+      });
+      const data = await response.json();
+      document.getElementById('status').innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
