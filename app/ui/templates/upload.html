@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Upload Data</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Upload Data</h1>
+    <nav>
+      <a href="/ui">Home</a>
+      <a href="/ui/job">Run Forecast</a>
+      <a href="/ui/recommendations">Recommendations</a>
+    </nav>
+  </header>
+  <main>
+    <form action="/datasets/upload" method="post" enctype="multipart/form-data" class="card">
+      <label>SKU Master CSV
+        <input type="file" name="sku_master" required />
+      </label>
+      <label>Sales Orders CSV
+        <input type="file" name="sales_orders" required />
+      </label>
+      <label>Inventory Snapshots CSV
+        <input type="file" name="inventory_snapshots" required />
+      </label>
+      <label>Purchase Orders CSV
+        <input type="file" name="purchase_orders" required />
+      </label>
+      <button type="submit">Upload</button>
+    </form>
+    <p class="hint">Use the sample_data folder for ready-made CSVs.</p>
+  </main>
+</body>
+</html>
